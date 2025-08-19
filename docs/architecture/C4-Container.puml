@@ -1,0 +1,25 @@
+@startuml C4-Container
+' C4-PlantUML Container diagram
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Usuário", "Operador das UIs")
+Container(auth, "Auth Service", "ASP.NET Core", "/login emite JWT + cookie HttpOnly; /home protegida; valida credenciais")
+Container(entry, "LancamentoService", "ASP.NET Core", "API lançamentos; publica evento LancamentoCreated; persiste em Postgres dedicado")
+Container(consol, "ConsolidacaoService", "ASP.NET Core", "Consumer eventos; consolida saldo diário; persiste em Postgres separado; cache Redis opcional")
+ContainerDb(db1, "Lancamento DB (Postgres)", "Relational DB", "Armazena lançamentos")
+ContainerDb(db2, "Consolidacao DB (Postgres)", "Relational DB", "Armazena SaldoDiario e lançamentos replicados")
+Container(rabbit, "RabbitMQ", "AMQP Broker", "Fila durável para eventos de lançamentos")
+Container(redis, "Redis", "Cache", "Cache distribuído para saldo diário (IDistributedCache)")
+
+Rel(user, auth, "Login /home", "HTTP/HTML")
+Rel(auth, user, "JWT + cookie fluxo_token", "Set-Cookie")
+Rel(user, entry, "Navega UI Lançamentos", "HTTP/HTML + JS")
+Rel(user, consol, "Navega UI Consolidação", "HTTP/HTML + JS")
+Rel(entry, db1, "Grava/consulta lançamentos", "SQL")
+Rel(entry, rabbit, "Publica eventos LancamentoCreated/Updated/Deleted", "AMQP")
+Rel(rabbit, consol, "Entrega eventos", "AMQP")
+Rel(consol, db2, "Grava/consulta SaldoDiario + lançamentos", "SQL")
+Rel(consol, redis, "Atualiza/ lê saldo consolidado", "IDistributedCache")
+Rel(consol, user, "Expõe relatório via API", "HTTP/JSON")
+
+@enduml

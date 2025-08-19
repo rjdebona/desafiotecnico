@@ -1,0 +1,10 @@
+**/bin
+**/obj
+.git
+.git/**/*
+*.user
+*.suo
+*.csproj.user
+Dockerfile.*
+README.md
+.vscode

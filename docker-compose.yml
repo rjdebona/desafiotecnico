@@ -1,0 +1,118 @@
+services:
+  postgres_lancamento:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: lanc_user
+      POSTGRES_PASSWORD: lanc_pw
+      POSTGRES_DB: lancamento_db
+    ports:
+      - "55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lanc_user"]
+      interval: 10s
+      retries: 5
+    volumes:
+      - pg_lanc_data:/var/lib/postgresql/data
+
+  postgres_consolidacao:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cons_user
+      POSTGRES_PASSWORD: cons_pw
+      POSTGRES_DB: consolidacao_db
+    ports:
+      - "55433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cons_user"]
+      interval: 10s
+      retries: 5
+    volumes:
+      - pg_consol_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    environment:
+      JWT_SECRET: dev_super_secret_key_1234567890_ABCDEFG
+      ADMIN_USER: admin
+      ADMIN_PASS: password
+    ports:
+      - "5080:8080"
+
+  lancamento:
+    build:
+      context: .
+      dockerfile: Dockerfile.lancamento
+    environment:
+      RABBIT_HOST: rabbitmq
+      JWT_SECRET: dev_super_secret_key_1234567890_ABCDEFG
+      LOGIN_BASE_URL: http://localhost:5080
+      API_KEY: dev-default-key
+      POSTGRES_HOST: postgres_lancamento
+      POSTGRES_DB: lancamento_db
+      POSTGRES_USER: lanc_user
+      POSTGRES_PASSWORD: lanc_pw
+    depends_on:
+      postgres_lancamento:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      auth:
+        condition: service_started
+    ports:
+      - "5007:8080"
+
+  consolidacao:
+    build:
+      context: .
+      dockerfile: Dockerfile.consolidacao
+    environment:
+      RABBIT_HOST: rabbitmq
+      REDIS_HOST: redis:6379
+      JWT_SECRET: dev_super_secret_key_1234567890_ABCDEFG
+      LOGIN_BASE_URL: http://localhost:5080
+      POSTGRES_HOST: postgres_consolidacao
+      POSTGRES_DB: consolidacao_db
+      POSTGRES_USER: cons_user
+      POSTGRES_PASSWORD: cons_pw
+    depends_on:
+      postgres_consolidacao:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_started
+      auth:
+        condition: service_started
+    ports:
+      - "5260:8080"
+
+  # grafana service removed per repository cleanup. Use docs/grafana for examples.
+
+volumes:
+  pg_lanc_data:
+  pg_consol_data:

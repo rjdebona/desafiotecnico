@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Consolidação - Saldo Diário</title>
+  <style>
+    body{font-family:Segoe UI,Arial;margin:30px;max-width:900px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+    h1{font-size:22px;margin:0}
+    nav a{margin-right:14px;text-decoration:none;color:#2563eb;font-weight:600}
+    table{border-collapse:collapse;width:100%;margin-top:16px}
+    th,td{border:1px solid #ddd;padding:6px 8px;font-size:14px}
+    th{background:#f3f4f6;text-align:left}
+    tbody tr:nth-child(even){background:#fafafa}
+    .saldo{margin-top:18px;font-size:16px;font-weight:600}
+    input[type=date]{padding:4px 6px}
+    .error{color:#b91c1c;margin-top:10px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Saldo Diário</h1>
+  <nav>
+    <a href="http://localhost:5007/">Lançamentos</a>
+    <a href="/swagger" target="_blank">Swagger</a>
+  </nav>
+</header>
+<label>Data: <input type="date" id="data"></label>
+<button id="btn">Carregar</button>
+<div id="msg" class="error" style="display:none"></div>
+<div class="saldo" id="saldo"></div>
+<table id="tbl" style="display:none">
+  <thead><tr><th>Descrição</th><th>Tipo</th><th>Valor</th><th>Data</th></tr></thead>
+  <tbody></tbody>
+</table>
+<script>
+const input = document.getElementById('data');
+const hoje = new Date();
+input.value = hoje.toISOString().substring(0,10);
+
+async function carregar(){
+  const d = input.value;
+  const r = await fetch('/api/saldodiario?data='+d,{headers:{'Accept':'application/json'}});
+  const msg = document.getElementById('msg');
+  if(!r.ok){ msg.style.display='block'; msg.textContent='Erro '+r.status+' (talvez não autenticado?)'; return; }
+  msg.style.display='none';
+  const j = await r.json();
+  document.getElementById('saldo').textContent = 'Saldo Total: '+ j.saldoTotal + ' (Data '+ j.data.substring(0,10)+')';
+  const tbody = document.querySelector('#tbl tbody');
+  tbody.innerHTML='';
+  j.lancamentos.forEach(l=>{
+    const tr=document.createElement('tr');
+  const tipoTxt = l.tipo === 0 || l.tipo === '0' ? 'Crédito' : (l.tipo === 1 || l.tipo === '1' ? 'Débito' : l.tipo);
+  tr.innerHTML = '<td>'+l.descricao+'</td><td>'+tipoTxt+'</td><td>'+l.valor+'</td><td>'+l.data.substring(0,10)+'</td>';
+    tbody.appendChild(tr);
+  });
+  document.getElementById('tbl').style.display='';
+}
+
+document.getElementById('btn').addEventListener('click',carregar);
+carregar();
+</script>
+</body>
+</html>

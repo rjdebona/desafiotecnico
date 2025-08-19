@@ -1,0 +1,25 @@
+@startuml C4-Component-Consolidacao
+' C4-PlantUML Component diagram for ConsolidacaoService
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(consol, "ConsolidacaoService", "ASP.NET Core")
+
+Component(consumer, "RabbitMQ Consumer", "Listener", "Assinatura da exchange 'lancamentos' e entrega de mensagens para o handler")
+Component(handler, "SaldoDiarioHandler", "Handler", "Processa LancamentoCreated: persiste Lancamento, atualiza SaldoDiario, grava cache Redis")
+Component(db, "ConsolidacaoDbContext", "EF Core DbContext", "Acesso a tabelas Lancamentos e SaldoDiario (Postgres dedicado)")
+Component(cache, "Distributed Cache (IDistributedCache)", "Redis / InMemory", "Armazenamento de saldo consolidado por dia: key 'saldo:yyyy-MM-dd'")
+Component(api, "API Controller", "ASP.NET Controller", "Endpoint GET /api/SaldoDiario?data=YYYY-MM-DD (UTC) retorna saldo e lançamentos do dia")
+
+Rel(consumer, handler, "Invoca")
+Rel(handler, db, "Lê/Escreve Lancamento e SaldoDiario")
+Rel(handler, cache, "Atualiza chave 'saldo:yyyy-MM-dd'")
+Rel(api, cache, "Lê/Escreve (cache-first)")
+Rel(api, db, "Fallback read do SaldoDiario se cache miss")
+
+Note right of consol
+	Requer JWT emitido pelo Auth Service (/auth/token via /login)
+	Cookie HttpOnly fluxo_token é lido pelo middleware de autenticação
+	Nenhum redirect custom central permanece (apenas 401 em APIs)
+end note
+
+@enduml

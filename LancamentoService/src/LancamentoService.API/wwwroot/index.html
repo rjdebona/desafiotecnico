@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Lançamentos</title>
+  <style>
+    body{font-family:Segoe UI,Arial;margin:30px;max-width:980px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    h1{font-size:22px;margin:0}
+    nav a{margin-right:14px;text-decoration:none;color:#2563eb;font-weight:600}
+    table{border-collapse:collapse;width:100%;margin-top:18px}
+    th,td{border:1px solid #ddd;padding:6px 8px;font-size:14px}
+    th{background:#f3f4f6;text-align:left}
+    tbody tr:nth-child(even){background:#fafafa}
+    form.inline *{margin-right:6px}
+    select,input[type=text],input[type=number]{padding:4px 6px}
+    .error{color:#b91c1c;margin-top:10px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Lançamentos</h1>
+  <nav>
+    <a href="http://localhost:5260/">Saldo Diário</a>
+    <a href="/swagger" target="_blank">Swagger</a>
+  </nav>
+</header>
+<form id="novo" class="inline">
+  <input type="text" id="descricao" placeholder="Descrição" required />
+  <select id="tipo"><option value="0">Crédito</option><option value="1">Débito</option></select>
+  <input type="number" id="valor" placeholder="Valor" step="0.01" required />
+  <button type="submit">Adicionar</button>
+</form>
+<div id="msg" class="error" style="display:none"></div>
+<table id="tbl" style="display:none">
+  <thead><tr><th>Descrição</th><th>Tipo</th><th>Valor</th><th>Data</th></tr></thead>
+  <tbody></tbody>
+</table>
+<script>
+const STORAGE_KEY = 'fluxoId';
+function getFluxoId(){ return window._fluxoId || localStorage.getItem(STORAGE_KEY); }
+function setFluxoId(id){ if(!id) return; window._fluxoId = id; localStorage.setItem(STORAGE_KEY,id); }
+
+async function obterOuCriarFluxoId(){
+  let id = getFluxoId();
+  if(id) return id;
+  // tenta obter existente
+  const resp = await fetch('/api/FluxoDeCaixa',{headers:{'Accept':'application/json'}});
+  if(resp.ok){
+    const lista = await resp.json();
+    if(Array.isArray(lista) && lista.length>0){ setFluxoId(lista[0].id); return lista[0].id; }
+  }
+  // cria novo se nada existir
+  const fluxo = { nome:'Fluxo Principal' };
+  const rf = await fetch('/api/FluxoDeCaixa',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(fluxo)});
+  if(!rf.ok){ throw new Error('Falha ao criar fluxo inicial'); }
+  const jf = await rf.json(); setFluxoId(jf.id); return jf.id;
+}
+
+async function listar(){
+  const r = await fetch('/api/FluxoDeCaixa',{headers:{'Accept':'application/json'}});
+  const msg=document.getElementById('msg');
+  if(!r.ok){ msg.style.display='block'; msg.textContent='Erro '+r.status; return; }
+  msg.style.display='none';
+  const data = await r.json();
+  const tbody = document.querySelector('#tbl tbody');
+  tbody.innerHTML='';
+  data.forEach(f=>{
+    f.lancamentos.forEach(l=>{
+      const tr=document.createElement('tr');
+      const tipoTxt = l.tipo === 0 || l.tipo === '0' ? 'Crédito' : 'Débito';
+      tr.innerHTML='<td>'+l.descricao+'</td><td>'+tipoTxt+'</td><td>'+l.valor+'</td><td>'+l.data.substring(0,10)+'</td>';
+      tbody.appendChild(tr);
+    });
+  });
+  // alinhar fluxoId com a lista
+  const current = getFluxoId();
+  if((!current || !data.some(f=>f.id===current)) && data.length>0){ setFluxoId(data[0].id); }
+  document.getElementById('tbl').style.display='';
+}
+
+document.getElementById('novo').addEventListener('submit', async e=>{
+  e.preventDefault();
+  try {
+    const fluxoId = await obterOuCriarFluxoId();
+    const lanc = {descricao: descricao.value, tipo: parseInt(tipo.value), valor: parseFloat(valor.value), data: new Date().toISOString() };
+    const resp = await fetch('/api/FluxoDeCaixa/'+fluxoId+'/lancamentos',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(lanc)});
+    if(!resp.ok){ alert('Erro ao adicionar lançamento: '+resp.status); return; }
+    descricao.value=''; valor.value='';
+    listar();
+  } catch(err){ alert(err.message); }
+});
+
+listar();
+</script>
+</body>
+</html>

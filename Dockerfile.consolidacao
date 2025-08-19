@@ -1,0 +1,19 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
+WORKDIR /src
+COPY ConsolidacaoService/src/ConsolidacaoService.API/*.csproj ConsolidacaoService/src/ConsolidacaoService.API/
+COPY FluxoDeCaixa.Auth/FluxoDeCaixa.Auth.csproj FluxoDeCaixa.Auth/
+RUN dotnet restore ConsolidacaoService/src/ConsolidacaoService.API/ConsolidacaoService.API.csproj
+
+FROM restore AS build
+COPY . .
+RUN dotnet publish ConsolidacaoService/src/ConsolidacaoService.API/ConsolidacaoService.API.csproj -c Release -o /out --no-restore
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /out .
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+ENTRYPOINT ["dotnet","ConsolidacaoService.API.dll"]

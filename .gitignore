@@ -1,0 +1,56 @@
+# Build outputs
+**/bin/
+**/obj/
+**/TestResults/
+
+# Tool caches
+**/.vs/
+**/.idea/
+**/.sonarqube/
+**/.scannerwork/
+
+# User specific / IDE
+.vscode/
+*.user
+*.swp
+*.suo
+
+# Logs & dumps
+*.log
+*.err
+logs/
+*.csv
+
+# Databases (runtime)
+*.db
+!docker/**
+
+# Dotnet artifacts
+project.lock.json
+*.nuget.props
+*.nuget.targets
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / front (if added later)
+node_modules/
+
+# Coverage
+coverage/
+
+# Generated diagrams / large jars (keep sources *.puml)
+docs/architecture/plantuml-*.jar
+# Ignore all generated PNG diagrams except the explicitly versioned C4 images usados no README
+docs/architecture/*.png
+!docs/architecture/C4-Context.png
+!docs/architecture/C4-Container.png
+!docs/architecture/C4-Component.png
+!docs/architecture/C4-Component-Consolidacao.png
+
+# Publish output
+/out/
+
+# Temporary backups
+_backup/

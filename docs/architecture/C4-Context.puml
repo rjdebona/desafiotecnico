@@ -1,0 +1,26 @@
+@startuml C4-Context
+' C4-PlantUML Context diagram
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Usuário / Operador", "Interage com a UI (Home, Lançamentos, Consolidado)")
+System(auth, "Auth Service", "Emite tokens JWT, página /login e /home (role-based)", "ASP.NET Core Web API")
+System(entry, "LancamentoService", "Gerencia CRUD de lançamentos e publica eventos (LancamentoCreated/Updated/Deleted)", "ASP.NET Core Web API")
+System(consol, "ConsolidacaoService", "Consome eventos e consolida saldo diário; expõe relatório", "ASP.NET Core Web API")
+System_Ext(rabbit, "RabbitMQ", "Message broker (AMQP) usado para desacoplamento)")
+System_Ext(redis, "Redis (cache)", "Armazenamento de cache distribuído para saldo diário)")
+System_Ext(db1, "Lancamento DB (Postgres)", "Persistência de lançamentos")
+System_Ext(db2, "Consolidacao DB (Postgres)", "Persistência consolidada e lançamentos replicados")
+
+Rel(user, auth, "Login / Home", "HTTP/HTML + Cookie")
+Rel(user, entry, "UI Lançamentos (após login)", "HTTP/HTML + JS")
+Rel(user, consol, "Consulta Consolidação (após login)", "HTTP/HTML + JS")
+Rel(auth, user, "Entrega JWT (cookie fluxo_token)", "Set-Cookie")
+Rel(entry, rabbit, "Publica eventos de lançamento", "AMQP")
+Rel(rabbit, consol, "Entrega eventos", "AMQP")
+Rel(consol, redis, "Atualiza saldo diário (cache)", "IDistributedCache / StackExchange.Redis")
+Rel(entry, db1, "Persiste lançamentos", "SQL")
+Rel(consol, db2, "Persiste / lê SaldoDiario", "SQL")
+
+@enduml
