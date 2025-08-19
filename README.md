@@ -1,10 +1,5 @@
 # Desafio CI&T - Solução de Fluxo de Caixa Diário
 
-## Desafio
-Documento de referência do enunciado:
-**[Desafio (PDF)](./docs/DesafioCIT.pdf)**
- 
-Observação: Remova este arquivo se não for permitido disponibilizar publicamente.
 
 ## Requisitos Funcionais
 | Código | Descrição | Implementado (Resumo) |
@@ -22,7 +17,7 @@ Observação: Remova este arquivo se não for permitido disponibilizar publicame
 | RNF-01 | Resiliência | Retry DB migrations & RabbitMQ, fanout exchange, containers separados de banco |
 | RNF-02 | Escalabilidade | Serviços stateless, mensagens desacopladas, bancos isolados por serviço |
 | RNF-03 | Confiabilidade | Idempotência no handler (checa existência de lançamento), filas duráveis |
-| RNF-04 | Segurança | Auth central (JWT + cookie), role básica `consolidator`, API Key para escrita (dev) |
+| RNF-04 | Segurança | Auth central (JWT + cookie)|
 | RNF-05 | Manutenibilidade | Código separado por serviço, migrations versionadas, documentação C4 |
 | RNF-06 | Observabilidade inicial | Logs console, healthchecks e mensagens de retry no startup |
 | RNF-07 | Desempenho | Índices em datas e chave composta, cache Redis (escrita) preparado |
@@ -75,15 +70,4 @@ docker compose up -d --build
 `Lancamento`: Id, FluxoDeCaixaId, Valor, Tipo (0 crédito / 1 débito), Data (UTC), Descricao
 `SaldoDiario`: Data (PK), SaldoTotal
 
-## Próximos Passos (Sugestão)
-- Implementar eventos Updated / Deleted
-- Outbox + DLQ + métricas
-- Leitura cache-first no relatório
-- Testes (unit, integração, carga automatizada)
-- Observabilidade (OTel + Prometheus)
-- Segurança avançada (TLS, secrets externos, refresh token)
-
-## Licença
-POC de desafio técnico (uso interno). Ajustar antes de produção.
-- GET `/api/FluxoDeCaixa`
 
