@@ -65,7 +65,7 @@ docker compose up -d --build
 `Lancamento`: Id, FluxoDeCaixaId, Valor, Tipo (0 crédito / 1 débito), Data (UTC), Descricao
 `SaldoDiario`: Data (PK), SaldoTotal
 
-## k6 
+## k6 Testes
 
 1) Executar (um único passo):
 
@@ -87,6 +87,19 @@ Como ler os resultados
 ```powershell
 Get-Content .\k6\k6-summary.json | ConvertFrom-Json | Format-List
 ```
+
+## Observação sobre as escolhas
+
+| Escolha | Por que | Benefício / Impacto |
+|---|---|---|
+| Arquitetura por microsserviços | Isola responsabilidades (Auth, Lançamento, Consolidação) e facilita deploy/escala independentes | Reduz blast radius, facilita escalonamento e deploy independente |
+| Comunicação assíncrona (RabbitMQ) | Desacopla produtores e consumidores; permite reprocessamento e buffering | Maior resiliência em picos e tolerância a falhas temporárias |
+| Postgres (persistência) | Banco relacional maduro, transacional e com suporte a migrações | Consistência transacional e histórico confiável de lançamentos |
+| Redis (cache) | Cache para leituras rápidas de saldo consolidado | Reduz latência em consultas críticas e alivia carga do DB |
+| .NET / C# | Ecosistema maduro para Web API e EF Core; alinhado com o requisito do desafio | Desenvolvimento rápido, integração com libs .NET e facilidade de manutenção |
+| k6 (teste de carga) | Ferramenta scriptável, reproduzível e integrável em CI | Permite validar requisitos de performance e automatizar testes de carga |
+
+
 
 
 
