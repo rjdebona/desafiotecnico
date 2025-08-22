@@ -68,9 +68,7 @@ docker compose up -d --build
 docker compose down -v && docker compose up -d --build
 ```
 ## Melhorias Futuras
-- **[Melhorias Futuras](./docs/ROADMAP.md)** - Roadmap de evolução e melhorias planejadas
-
-![Arquitetura Futura](./docs/architecture/C4-Context-Future.png)  
+- **[Melhorias Futuras](./docs/ROADMAP.md)** - Roadmap de evolução e melhorias planejadas  
 
 ## Execução Rápida
 ```powershell
@@ -81,9 +79,6 @@ UIs/APIs:
 - Lançamentos: http://localhost:5007/
 - Consolidação: http://localhost:5260/
 - RabbitMQ: http://localhost:15672
-
-## Testes de Performance
-- **[Testes de Performance](./docs/TESTING.md)** - Instruções k6 e validação de requisitos
 
 ## Reset de Dados
 ```powershell

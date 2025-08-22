@@ -1,6 +1,6 @@
 
 ### Contexto
-![C4 Context](./docs/architecture/C4-Context.png)
+![C4 Context](./architecture/C4-Context.png)
 
 ## Containers (do README)
 ![C4 Container](./architecture/C4-Container.png)
