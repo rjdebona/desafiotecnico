@@ -24,7 +24,6 @@ namespace LancamentoService.Infrastructure
 
         public void Add(FluxoDeCaixa fluxo)
         {
-            // Persist the provided instance Id so the caller sees the same Id as persisted
             FluxoDeCaixa _fluxo = new FluxoDeCaixa(fluxo.Id == Guid.Empty ? Guid.NewGuid() : fluxo.Id, fluxo.Nome, fluxo.Lancamentos);
             _context.FluxosDeCaixa.Add(_fluxo);
             _context.SaveChanges();
@@ -81,10 +80,7 @@ namespace LancamentoService.Infrastructure
             var fluxo = _context.FluxosDeCaixa.Find(id);
             if (fluxo == null) return;
             _context.FluxosDeCaixa.Remove(fluxo);
-                // If the aggregate instance is already tracked by the DbContext (e.g. retrieved via GetById),
-                // do not call Update(fluxo) because that will mark the whole object graph as Modified and
-                // can force UPDATE statements for newly added child entities. Instead, persist tracked
-                // changes with SaveChanges(). If the instance is detached, attach/update it first.
+
                 var tracked = _context.ChangeTracker.Entries<FluxoDeCaixa>().FirstOrDefault(e => e.Entity.Id == fluxo.Id && e.State != Microsoft.EntityFrameworkCore.EntityState.Detached);
                 if (tracked != null)
                 {

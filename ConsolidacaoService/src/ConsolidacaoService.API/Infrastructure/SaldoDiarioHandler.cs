@@ -22,7 +22,7 @@ public class SaldoDiarioHandler : ISaldoHandler
     public async Task HandleLancamentoCreatedAsync(JsonElement data)
     {
 
-        // Espera apenas payload de fluxo completo: { Id, Nome, Lancamentos: [] }
+
         if (!data.TryGetProperty("Lancamentos", out var lancsElem) || lancsElem.ValueKind != JsonValueKind.Array)
         {
             _logger?.LogWarning("Payload sem Lancamentos array ignorado");

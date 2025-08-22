@@ -18,7 +18,6 @@ if (string.IsNullOrWhiteSpace(redisHost) || redisHost == "memory")
 else
     builder.Services.AddStackExchangeRedisCache(o => { o.Configuration = redisHost; o.InstanceName = "consolidacao_"; });
 
-// Database configuration: Postgres only (SQLite removido)
 var pgHost = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "postgres";
 var pgDb = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "fluxo_db";
 var pgUser = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "fluxo";

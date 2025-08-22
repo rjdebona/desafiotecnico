@@ -74,9 +74,8 @@ namespace LancamentoService.API.Controllers
             var lId = dto.Id == Guid.Empty ? Guid.NewGuid() : dto.Id;
             var _lancamento = new Lancamento(lId, dto.Tipo, dto.Valor, dto.Data, dto.Descricao, fluxoId);
 
-            // Use the tracked entity returned by repository to avoid EF Core tracking conflicts
             fluxo.AddLancamento(_lancamento);
-            _repository.Update(fluxo); // salva o agregado completo e publica evento FluxoFull
+            _repository.Update(fluxo); 
 
             return Created($"api/FluxoDeCaixa/{fluxoId}/lancamentos/{_lancamento.Id}", _lancamento);
         }

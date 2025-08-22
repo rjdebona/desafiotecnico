@@ -23,7 +23,6 @@ namespace LancamentoService.Domain
         // EF Core
         private Lancamento() { }
 
-        // Used by System.Text.Json to deserialize incoming API payloads
         public Lancamento(Guid id,TipoLancamento tipo, decimal valor, DateTime data, string descricao, Guid fluxoDeCaixaId)
         {
             if (fluxoDeCaixaId == Guid.Empty)

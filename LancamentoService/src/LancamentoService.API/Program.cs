@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using FluxoDeCaixaAuth;
 using LancamentoService.Infrastructure;
-// using LancamentoService.Domain; // seed removido
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,18 +10,17 @@ builder.Services.AddFluxoDeCaixaAuth(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Database configuration: Postgres only (SQLite removido)
 var pgHost = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "postgres";
 var pgDb = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "fluxo_db";
 var pgUser = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "fluxo";
 var pgPw = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "fluxo_pw";
 var pgPort = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
 var configuredCs = builder.Configuration.GetConnectionString("DefaultConnection");
-// Se já veio uma connection string completa (ex: via env ConnectionStrings__DefaultConnection) usamos ela; caso contrário montamos incluindo a porta.
+
 var pgCs = string.IsNullOrWhiteSpace(configuredCs)
     ? $"Host={pgHost};Port={pgPort};Database={pgDb};Username={pgUser};Password={pgPw};Include Error Detail=true"
     : configuredCs;
-// Aviso defensivo: detectar se veio uma connection string de SQLite por engano
+
 if (pgCs.Contains("Data Source=", StringComparison.OrdinalIgnoreCase) || pgCs.EndsWith(".db", StringComparison.OrdinalIgnoreCase))
 {
     Console.WriteLine($"[Lancamento][WARN] Connection string aparenta ser SQLite: '{pgCs}'. Verifique se variáveis POSTGRES_* estão definidas corretamente e remova ConnectionStrings__DefaultConnection.");
