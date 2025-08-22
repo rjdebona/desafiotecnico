@@ -48,6 +48,7 @@ docs/architecture/*.png
 !docs/architecture/C4-Container.png
 !docs/architecture/C4-Component.png
 !docs/architecture/C4-Component-Consolidacao.png
+!docs/architecture/C4-Context-Future.png
 
 # Publish output
 /out/
