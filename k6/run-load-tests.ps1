@@ -4,15 +4,9 @@ param(
     [int]$Vus = 50,
     [string]$Duration = '30s',
     [string]$ApiKey = 'dev-default-key',
-    param(
-        [ValidateSet('consolidacao','lancamento')]
-        [string]$Target = 'consolidacao',
-        [int]$Vus = 50,
-        [string]$Duration = '30s',
-        [string]$ApiKey = 'dev-default-key',
-        [string]$BaseUrl = '',
-        [string]$SummaryFileName = 'k6-summary.json'
-    )
+    [string]$BaseUrl = '',
+    [string]$SummaryFileName = 'k6-summary.json'
+)
 
     $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
     $absPath = (Resolve-Path $scriptDir).Path
@@ -38,21 +32,7 @@ param(
 
     Write-Host "Executing: docker $($dockerArgs -join ' ')"
 
-    ```powershell
-    param(
-        [ValidateSet('consolidacao','lancamento')]
-        [string]$Target = 'consolidacao',
-        [int]$Vus = 50,
-        [string]$Duration = '30s',
-        [string]$ApiKey = 'dev-default-key',
-        [string]$BaseUrl = '',
-        [string]$SummaryFileName = 'k6-summary.json'
-    )
-
-    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-    $absPath = (Resolve-Path $scriptDir).Path
-
-    # default base URLs when none provided (use host.docker.internal for Docker)
+# default base URLs when none provided (use host.docker.internal for Docker)
     if ([string]::IsNullOrEmpty($BaseUrl)) {
         if ($Target -eq 'consolidacao') { $BaseUrl = 'http://host.docker.internal:5260' }
         else { $BaseUrl = 'http://host.docker.internal:5007' }
@@ -89,4 +69,3 @@ param(
 
     # NOTE: Influx publishing support has been removed from the repository. To publish results,
     # manually use a push script or add your own implementation.
-    ```
