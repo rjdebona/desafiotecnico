@@ -1,0 +1,23 @@
+@startuml C4-Context-Future
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Sistema de Fluxo de Caixa - Contexto Futuro (Roadmap)
+
+Person(usuario, "Usuario", "Usuario do sistema de fluxo de caixa")
+Person(admin, "Administrador", "Monitora sistema e metricas")
+
+System_Boundary(sistema, "Sistema de Fluxo de Caixa") {
+    System(fluxo_caixa, "Fluxo de Caixa", "Sistema com observabilidade, resiliencia e seguranca aprimoradas")
+}
+
+System_Ext(oauth, "OAuth 2.0 Provider", "Autenticacao e autorizacao")
+System_Ext(monitoring, "Stack Observabilidade", "Prometheus, Grafana, Jaeger")
+System_Ext(kubernetes, "Kubernetes", "Orquestracao e autoscaling")
+
+Rel(usuario, fluxo_caixa, "Usa sistema", "HTTPS/OAuth 2.0")
+Rel(admin, monitoring, "Monitora metricas", "HTTPS")
+Rel(fluxo_caixa, oauth, "Autentica", "OAuth 2.0")
+Rel(fluxo_caixa, monitoring, "Envia metricas/traces", "OpenTelemetry")
+Rel(kubernetes, fluxo_caixa, "Orquestra", "K8s API")
+
+@enduml

@@ -1,7 +1,9 @@
 # Desafio CI&T - Solução de Fluxo de Caixa Diário
 
+Sistema de controle de fluxo de caixa diário implementado com arquitetura de microsserviços, utilizando .NET Core, PostgreSQL, RabbitMQ e Redis.
 
 ## Requisitos Funcionais
+
 | Código | Descrição | Implementado (Resumo) |
 |--------|-----------|------------------------|
 | RF-01 | Registrar lançamentos (débito/crédito) com valor, data, descrição | API CRUD em `LancamentoService` + tipo Crédito/Débito + evento `LancamentoCreated` |
@@ -12,6 +14,7 @@
 | RF-06 | Autenticação centralizada | Serviço Auth (login, token JWT HS256 + cookie HttpOnly) usado pelos demais serviços |
 
 ## Requisitos Não Funcionais
+
 | Código | Descrição | Implementado (Resumo) |
 |--------|-----------|-----------------------|
 | RNF-01 | Resiliência | Retry DB migrations & RabbitMQ, fanout exchange, containers separados de banco |
@@ -24,21 +27,50 @@
 | RNF-08 | Infraestrutura & Deploy | Docker Compose, Postgres segregado (`postgres_lancamento` / `postgres_consolidacao`), variáveis de retry |
 
 ## Visão Técnica Sintética
-- Serviços: Auth, LancamentoService, ConsolidacaoService
-- Mensageria: RabbitMQ (exchange fanout `lancamentos`)
-- Bancos: Postgres (2 containers, um por serviço)
-- Cache: Redis (saldo diário)
-- Auth: JWT HS256 + Cookie HttpOnly
-- Containerização: Docker Compose (healthchecks, dependências ordenadas)
 
-## Arquitetura (C4)
-Visão resumida em três níveis usando C4:
+- **Serviços:** Auth, LancamentoService, ConsolidacaoService
+- **Mensageria:** RabbitMQ (exchange fanout `lancamentos`)
+- **Bancos:** Postgres (2 containers, um por serviço)
+- **Cache:** Redis (saldo diário)
+- **Auth:** JWT HS256 + Cookie HttpOnly
+- **Containerização:** Docker Compose (healthchecks, dependências ordenadas)
 
-### Contexto
-![C4 Context](./docs/architecture/C4-Context.png)
+## Tabela de Decisões
 
-### Containers
-![C4 Container](./docs/architecture/C4-Container.png)
+| Escolha | Por que | Benefício / Impacto |
+|---|---|---|
+| Arquitetura por microsserviços | Isola responsabilidades (Auth, Lançamento, Consolidação) e facilita deploy/escala independentes | Facilita escalonamento e deploy independente |
+| Comunicação assíncrona (RabbitMQ) | Desacopla produtores e consumidores; permite reprocessamento e buffering | Maior resiliência em picos e tolerância a falhas temporárias |
+| Postgres (persistência) | Banco relacional maduro, transacional e com suporte a migrações | Consistência transacional e histórico confiável de lançamentos |
+| Redis (cache) | Cache para leituras rápidas de saldo consolidado | Reduz latência em consultas críticas e alivia carga do DB |
+| .NET / C# | Ecosistema maduro para Web API e EF Core; alinhado com o requisito do desafio | Desenvolvimento rápido, integração com libs .NET e facilidade de manutenção |
+| k6 (teste de carga) | Ferramenta scriptável, reproduzível e integrável em CI | Permite validar requisitos de performance e automatizar testes de carga |
+
+## Arquitetura Definida
+- **[Arquitetura da Solução](./docs/ARCHITECTURE.md)** - Diagramas C4, estrutura de eventos e modelo de dados
+
+## Alternativas Arquiteturais
+- **[Alternativas Arquiteturais](./docs/ALTERNATIVES.md)** - Outras abordagens consideradas durante o planejamento
+
+## Execução Rápida
+
+```bash
+# Iniciar todos os serviços
+docker compose up -d --build
+
+# Acessar as aplicações
+# Auth: http://localhost:5080/login
+# Lançamentos: http://localhost:5007/
+# Consolidação: http://localhost:5260/
+# RabbitMQ: http://localhost:15672
+
+# Reset completo dos dados
+docker compose down -v && docker compose up -d --build
+```
+## Melhorias Futuras
+- **[Melhorias Futuras](./docs/ROADMAP.md)** - Roadmap de evolução e melhorias planejadas
+
+![Arquitetura Futura](./docs/architecture/C4-Context-Future.png)  
 
 ## Execução Rápida
 ```powershell
@@ -50,54 +82,17 @@ UIs/APIs:
 - Consolidação: http://localhost:5260/
 - RabbitMQ: http://localhost:15672
 
+## Testes de Performance
+- **[Testes de Performance](./docs/TESTING.md)** - Instruções k6 e validação de requisitos
+
 ## Reset de Dados
 ```powershell
 docker compose down -v
 docker compose up -d --build
 ```
 
-## Estrutura de Eventos
-- Evento publicado: `LancamentoCreated` (extensível para Updated/Deleted)
-- Exchange: `lancamentos` (fanout)
-- Fila consumer: `lancamentos_consolidacao`
 
-## Modelo de Dados (Essencial)
-`Lancamento`: Id, FluxoDeCaixaId, Valor, Tipo (0 crédito / 1 débito), Data (UTC), Descricao
-`SaldoDiario`: Data (PK), SaldoTotal
 
-## k6 Testes
-
-1) Executar (um único passo):
-
-```powershell
-# a partir da raiz do repositório (independente do caminho local)
-.\k6\run-load-tests.ps1
-```
-
-O comando acima inicia o cenário de teste definido nos scripts em `k6/`.
-
-O que será testado
-- `k6/script.js`: faz chamadas concorrentes ao endpoint `GET /api/SaldoDiario?data=YYYY-MM-DD` (padrão: data de hoje). Ele obtém um token de `Auth` no setup e valida respostas 200; configuração padrão: 10 VUs por 30s.
-- `k6/create_lancamentos.js` (opcional): cria lançamentos via `POST /api/FluxoDeCaixa/{fluxoId}/lancamentos` para exercitar o caminho de escrita (configuração: 5 VUs por 30s).
-
-Como ler os resultados
-- Resumo no console: ao final do k6 você verá métricas principais (VUs, requisições, erros, `http_req_duration` com percentis p(90)/p(95)/p(99)). Esse resumo geralmente atende para verificar performance e regressões.
-- JSON detalhado (se gerado): o script pode salvar um resumo em `k6/k6-summary.json`. Para abrir:
-
-```powershell
-Get-Content .\k6\k6-summary.json | ConvertFrom-Json | Format-List
-```
-
-## Observação sobre as escolhas
-
-| Escolha | Por que | Benefício / Impacto |
-|---|---|---|
-| Arquitetura por microsserviços | Isola responsabilidades (Auth, Lançamento, Consolidação) e facilita deploy/escala independentes | Reduz blast radius, facilita escalonamento e deploy independente |
-| Comunicação assíncrona (RabbitMQ) | Desacopla produtores e consumidores; permite reprocessamento e buffering | Maior resiliência em picos e tolerância a falhas temporárias |
-| Postgres (persistência) | Banco relacional maduro, transacional e com suporte a migrações | Consistência transacional e histórico confiável de lançamentos |
-| Redis (cache) | Cache para leituras rápidas de saldo consolidado | Reduz latência em consultas críticas e alivia carga do DB |
-| .NET / C# | Ecosistema maduro para Web API e EF Core; alinhado com o requisito do desafio | Desenvolvimento rápido, integração com libs .NET e facilidade de manutenção |
-| k6 (teste de carga) | Ferramenta scriptável, reproduzível e integrável em CI | Permite validar requisitos de performance e automatizar testes de carga |
 
 
 
