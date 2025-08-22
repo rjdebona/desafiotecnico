@@ -80,6 +80,9 @@ UIs/APIs:
 - Consolidação: http://localhost:5260/
 - RabbitMQ: http://localhost:15672
 
+## Testes de Performance
+- **[Testes de Performance](./docs/TESTING.md)** - Instruções k6 e validação de requisitos
+
 ## Reset de Dados
 ```powershell
 docker compose down -v
