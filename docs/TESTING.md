@@ -20,3 +20,4 @@ O comando acima inicia o cenário de teste definido nos scripts em `k6/`.
 ```powershell
 Get-Content .\k6\k6-summary.json | ConvertFrom-Json | Format-List
 ```
+
