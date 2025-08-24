@@ -4,27 +4,23 @@ Sistema de controle de fluxo de caixa diário implementado com arquitetura de mi
 
 ## Requisitos Funcionais
 
-| Código | Descrição | Implementado (Resumo) |
-|--------|-----------|------------------------|
-| RF-01 | Registrar lançamentos (débito/crédito) com valor, data, descrição | API CRUD em `LancamentoService` + tipo Crédito/Débito + evento `LancamentoCreated` |
-| RF-02 | Persistir lançamentos | Postgres dedicado (`lancamento_db`) via EF Core migrations |
-| RF-03 | Consultar histórico de lançamentos | Endpoint `GET /api/FluxoDeCaixa` lista fluxos e lançamentos relacionados |
-| RF-04 | Consolidar saldo diário | Consumer no `ConsolidacaoService` atualiza `SaldoDiario` idempotente ao receber evento |
-| RF-05 | Relatório consolidado diário | Endpoint `GET /api/SaldoDiario?data=YYYY-MM-DD` + UI estática |
-| RF-06 | Autenticação centralizada | Serviço Auth (login, token JWT HS256 + cookie HttpOnly) usado pelos demais serviços |
+| Código | Descrição | Requisito | Implementado (Resumo) |
+|--------|-----------|-----------|------------------------|
+| RF-01 | Registrar lançamentos (débito/crédito) com valor, data, descrição | O sistema deve permitir o registro de lançamentos de débito e crédito com valor, data, e descrição | API CRUD em `LancamentoService` + tipo Crédito/Débito + evento `LancamentoCreated` |
+| RF-02 | Persistir lançamentos | O sistema deve armazenar os lançamentos de forma persistente | Postgres dedicado (`lancamento_db`) via EF Core migrations |
+| RF-03 | Consultar histórico de lançamentos | O sistema deve permitir a consulta do histórico de lançamentos | Endpoint `GET /api/FluxoDeCaixa` lista fluxos e lançamentos relacionados |
+| RF-04 | Consolidar saldo diário | O sistema deve ser capaz de processar todos os lançamentos de um dia para gerar um saldo consolidado | Consumer no `ConsolidacaoService` atualiza `SaldoDiario` idempotente ao receber evento |
+| RF-05 | Relatório consolidado diário | O serviço de consolidação deve expor uma API para que o relatório possa ser consumido | Endpoint `GET /api/SaldoDiario?data=YYYY-MM-DD` + UI estática |
 
 ## Requisitos Não Funcionais
 
-| Código | Descrição | Implementado (Resumo) |
-|--------|-----------|-----------------------|
-| RNF-01 | Resiliência | Retry DB migrations & RabbitMQ, fanout exchange, containers separados de banco |
-| RNF-02 | Escalabilidade | Serviços stateless, mensagens desacopladas, bancos isolados por serviço |
-| RNF-03 | Confiabilidade | Idempotência no handler (checa existência de lançamento), filas duráveis |
-| RNF-04 | Segurança | Auth central (JWT + cookie)|
-| RNF-05 | Manutenibilidade | Código separado por serviço, migrations versionadas, documentação C4 |
-| RNF-06 | Observabilidade inicial | Logs console, healthchecks e mensagens de retry no startup |
-| RNF-07 | Desempenho | Índices em datas e chave composta, cache Redis (escrita) preparado |
-| RNF-08 | Infraestrutura & Deploy | Docker Compose, Postgres segregado (`postgres_lancamento` / `postgres_consolidacao`), variáveis de retry |
+| Código | Descrição | Requisito | Implementado (Resumo) |
+|--------|-----------|-----------|-----------------------|
+| RNF-01 | Resiliência | O serviço de controle de lançamento não deve ficar indisponível se o sistema de consolidado diário falhar | Retry DB migrations & RabbitMQ, fanout exchange, containers separados de banco |
+| RNF-02 | Escalabilidade | O serviço de consolidado diário deve ser capaz de receber 50 requisições por segundo em picos | Serviços stateless, mensagens desacopladas, bancos isolados por serviço |
+| RNF-03 | Confiabilidade | O serviço de consolidado diário deve garantir uma perda máxima de 5% de requisições em picos | Idempotência no handler (checa existência de lançamento), filas duráveis |
+| RNF-04 | Segurança | O serviço deve implementar mecanismos de autenticação e autorização para o registro e consulta de lançamentos | Auth central (JWT + cookie)|
+| RNF-05 | Manutenibilidade | O código deve ser modular, com documentação clara e testes | Código separado por serviço, migrations versionadas, documentação C4 |
 
 ## Visão Técnica Sintética
 
