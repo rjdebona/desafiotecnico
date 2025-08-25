@@ -45,6 +45,15 @@ Sistema de controle de fluxo de caixa diário implementado com arquitetura de mi
 ## Arquitetura Definida
 - **[Arquitetura da Solução](./docs/ARCHITECTURE.md)** - Diagramas C4, estrutura de eventos e modelo de dados
 
+**Justificativa:**
+A escolha por microsserviços foi motivada pelos requisitos específicos do desafio, especialmente o RNF-01 (Resiliência) que exige que "o serviço de controle de lançamento não deve ficar indisponível se o sistema de consolidado diário falhar". Esta arquitetura garante que cada domínio funcional seja independente, permitindo que falhas em um serviço não afetem os demais.
+
+**Benefícios alcançados:**
+- **Isolamento de falhas**: O serviço de lançamentos continua operacional mesmo se a consolidação falhar
+- **Escalabilidade independente**: Cada serviço pode ser escalado conforme sua demanda específica
+- **Deploy independente**: Atualizações podem ser feitas em um serviço sem afetar os outros
+- **Responsabilidade única**: Cada serviço tem uma responsabilidade bem definida
+
 ## Alternativas Arquiteturais
 - **[Alternativas Arquiteturais](./docs/ALTERNATIVES.md)** - Outras abordagens consideradas durante o planejamento
 
