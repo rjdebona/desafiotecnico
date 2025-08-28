@@ -29,6 +29,18 @@ export default function (data) {
   const token = data?.token || __ENV.ACCESS_TOKEN || null;
   const params = token ? { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } } : { headers: { Accept: 'application/json' } };
   const res = http.get(url, params);
-  check(res, { 'status 200': (r) => r.status === 200 });
-  sleep(0.2);
+  let fromCache = false;
+  try {
+    const body = JSON.parse(res.body);
+    fromCache = body.fromCache === true;
+  } catch (e) {
+    fromCache = false;
+  }
+  check(res, {
+    'status 200': (r) => r.status === 200,
+    'from cache': (r) => fromCache,
+    'response time < 500ms': (r) => r.timings.duration < 500
+  });
+  // Log detalhado para análise
+  console.log(`status: ${res.status}, fromCache: ${fromCache}, duration: ${res.timings.duration}ms`);
 }
