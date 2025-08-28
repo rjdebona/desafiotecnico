@@ -14,8 +14,8 @@
 
 | Código | Descrição | Requisito | Como é Testado |
 |--------|-----------|-----------|----------------|
-| RNF-02 | Escalabilidade | O serviço de consolidado diário deve ser capaz de receber 50 requisições por segundo em picos | Script padrão usa 50 VUs por 30s. **Com Cache Redis: 233 req/s** (366% acima do requisito) |
-| RNF-03 | Confiabilidade | O serviço de consolidado diário deve garantir uma perda máxima de 5% de requisições em picos | k6 valida taxa de sucesso (checks). **Com Cache Redis: 0% falhas** (100% success rate) |
+| RNF-02 | Escalabilidade | O serviço de consolidado diário deve ser capaz de receber 50 requisições por segundo em picos | Script padrão usa 50 VUs por 30s. **Com Cache Redis: 707 req/s** (1.414% acima do requisito, ambiente atual) |
+| RNF-03 | Confiabilidade | O serviço de consolidado diário deve garantir uma perda máxima de 5% de requisições em picos | k6 valida taxa de sucesso (checks). **Com Cache Redis: 0% falhas** (100% success rate, ambiente atual) |
 | RNF-04 | Segurança | O serviço deve implementar mecanismos de autenticação e autorização para o registro e consulta de lançamentos | Setup obtém token JWT do serviço Auth e usa em todas as requisições |
 
 ## k6 Testes
@@ -40,7 +40,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 O comando acima inicia o cenário de teste definido nos scripts em `k6/`.
 
 ### O que será testado
-- `k6/script.js`: faz chamadas concorrentes ao endpoint `GET /api/SaldoDiario?data=YYYY-MM-DD` (padrão: data de hoje). Ele obtém um token de `Auth` no setup e valida respostas 200; configuração padrão: 10 VUs por 30s.
+- `k6/script.js`: faz chamadas concorrentes ao endpoint `GET /api/SaldoDiario?data=YYYY-MM-DD` (padrão: data de hoje). Ele obtém um token de `Auth` no setup e valida respostas 200, cache Redis e tempo de resposta; configuração padrão: 50 VUs por 30s. Resultados atuais: **707 req/s**, 100% cache, 0% erros.
 - `k6/create_lancamentos.js` (opcional): cria lançamentos via `POST /api/FluxoDeCaixa/{fluxoId}/lancamentos` para exercitar o caminho de escrita (configuração: 5 VUs por 30s).
 
 ### Como ler os resultados
