@@ -25,7 +25,7 @@ export function setup() {
 const LANCAMENTO_BASE = __ENV.LANCAMENTO_BASE || __ENV.ENTRY_BASE || 'http://host.docker.internal:5007';
 
 export default function (data) {
-  const token = data?.token || __ENV.ACCESS_TOKEN || null;
+  const token = (data && data.token) || __ENV.ACCESS_TOKEN || null;
   const headers = token ? 
     { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } : 
     { 'Accept': 'application/json' };
