@@ -27,7 +27,7 @@ Sistema de controle de fluxo de caixa diário implementado com arquitetura de mi
 - **Serviços:** Auth, LancamentoService, ConsolidacaoService
 - **Mensageria:** RabbitMQ (exchange fanout `lancamentos`)
 - **Bancos:** Postgres (2 containers, um por serviço)
-- **Cache:** Redis (saldo diário)
+- **Cache:** Redis (saldo diário, TTL 1h) - Consultas de saldo primeiro verificam cache, fallback para DB
 - **Auth:** JWT HS256 + Cookie HttpOnly
 - **Containerização:** Docker Compose (healthchecks, dependências ordenadas)
 
@@ -60,7 +60,7 @@ A escolha por microsserviços foi motivada pelos requisitos específicos do desa
 ## Execução Rápida
 
 ```bash
-# Iniciar todos os serviços
+# Iniciar todos os serviços (incluindo Redis)
 docker compose up -d --build
 
 # Acessar as aplicações
@@ -68,8 +68,13 @@ docker compose up -d --build
 # Lançamentos: http://localhost:5007/
 # Consolidação: http://localhost:5260/
 # RabbitMQ: http://localhost:15672
+# Redis: localhost:6379
 
-# Reset completo dos dados
+# Verificar se Redis está funcionando
+docker exec projetociandt-redis-1 redis-cli ping
+# Deve retornar: PONG
+
+# Reset completo dos dados (inclui cache Redis)
 docker compose down -v && docker compose up -d --build
 ```
 
