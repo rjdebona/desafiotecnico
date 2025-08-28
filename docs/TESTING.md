@@ -14,7 +14,7 @@
 
 | Código | Descrição | Requisito | Como é Testado |
 |--------|-----------|-----------|----------------|
-| RNF-02 | Escalabilidade | O serviço de consolidado diário deve ser capaz de receber 50 requisições por segundo em picos | Script padrão usa 50 VUs por 30s. **Com Cache Redis: 1,332 req/s** (2,664% acima do requisito) |
+| RNF-02 | Escalabilidade | O serviço de consolidado diário deve ser capaz de receber 50 requisições por segundo em picos | Script padrão usa 50 VUs por 30s. **Com Cache Redis: 233 req/s** (366% acima do requisito) |
 | RNF-03 | Confiabilidade | O serviço de consolidado diário deve garantir uma perda máxima de 5% de requisições em picos | k6 valida taxa de sucesso (checks). **Com Cache Redis: 0% falhas** (100% success rate) |
 | RNF-04 | Segurança | O serviço deve implementar mecanismos de autenticação e autorização para o registro e consulta de lançamentos | Setup obtém token JWT do serviço Auth e usa em todas as requisições |
 
