@@ -71,7 +71,7 @@ docker compose up -d --build
 # Redis: localhost:6379
 
 # Verificar se Redis está funcionando
-docker exec projetociandt-redis-1 redis-cli ping
+docker exec fluxodecaixa-redis-1 redis-cli ping
 # Deve retornar: PONG
 
 # Reset completo dos dados (inclui cache Redis)

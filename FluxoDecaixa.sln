@@ -2,6 +2,51 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LancamentoService", "LancamentoService", "{059B8861-5CEC-C8AC-C4D8-3FF57EDB938B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LancamentoService.API", "LancamentoService\src\LancamentoService.API\LancamentoService.API.csproj", "{011F05C2-1BA2-90C9-0F49-FCA697883186}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxoDeCaixa", "FluxoDeCaixa\FluxoDeCaixa.csproj", "{C1D2E3F4-A5B6-7890-1234-56789ABCDEF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluxoDeCaixa.Auth", "FluxoDeCaixa.Auth\FluxoDeCaixa.Auth.csproj", "{ABE092CF-7824-4079-BBAC-30B9A6FCD879}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolidacaoService.API", "ConsolidacaoService\src\ConsolidacaoService.API\ConsolidacaoService.API.csproj", "{B7C1F4D2-62A8-48F9-BE7E-0D6E7B9F0A11}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{059B8861-5CEC-C8AC-C4D8-3FF57EDB938B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+	{059B8861-5CEC-C8AC-C4D8-3FF57EDB938B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	{059B8861-5CEC-C8AC-C4D8-3FF57EDB938B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	{059B8861-5CEC-C8AC-C4D8-3FF57EDB938B}.Release|Any CPU.Build.0 = Release|Any CPU
+	{011F05C2-1BA2-90C9-0F49-FCA697883186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+	{011F05C2-1BA2-90C9-0F49-FCA697883186}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	{011F05C2-1BA2-90C9-0F49-FCA697883186}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	{011F05C2-1BA2-90C9-0F49-FCA697883186}.Release|Any CPU.Build.0 = Release|Any CPU
+	{ABE092CF-7824-4079-BBAC-30B9A6FCD879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+	{ABE092CF-7824-4079-BBAC-30B9A6FCD879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	{ABE092CF-7824-4079-BBAC-30B9A6FCD879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	{ABE092CF-7824-4079-BBAC-30B9A6FCD879}.Release|Any CPU.Build.0 = Release|Any CPU
+	{B7C1F4D2-62A8-48F9-BE7E-0D6E7B9F0A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+	{B7C1F4D2-62A8-48F9-BE7E-0D6E7B9F0A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	{B7C1F4D2-62A8-48F9-BE7E-0D6E7B9F0A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	{B7C1F4D2-62A8-48F9-BE7E-0D6E7B9F0A11}.Release|Any CPU.Build.0 = Release|Any CPU
+	{C5F4A9C2-A8F3-4D4F-9C61-0A9B8C7D6E5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+	{C5F4A9C2-A8F3-4D4F-9C61-0A9B8C7D6E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	{C5F4A9C2-A8F3-4D4F-9C61-0A9B8C7D6E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5F4A9C2-A8F3-4D4F-9C61-0A9B8C7D6E5F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobalSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E-EAC7-C090-1BA3-A61EC2A24D84}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{001BD770-4281-46BA-4B7E-D630D42F8E3B}"
