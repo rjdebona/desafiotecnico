@@ -1,4 +1,4 @@
-# Desafio CI&T - Solução de Fluxo de Caixa Diário
+# Desafio - Solução de Fluxo de Caixa Diário
 
 Sistema de controle de fluxo de caixa diário implementado com arquitetura de microsserviços, utilizando .NET Core, PostgreSQL, RabbitMQ e Redis.
 
